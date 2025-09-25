@@ -1,0 +1,75 @@
+## Build output
+[Bb]in/
+[Oo]bj/
+[Bb]uild/
+[Ll]og/
+artifacts/
+publish/
+
+## Visual Studio & VS Code
+.vs/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.user
+*.suo
+*.userosscache
+*.userprefs
+*.rsuser
+*.sln.docstates
+
+## NuGet
+*.nupkg
+*.snupkg
+*.nuspec
+*.nuget.props
+*.nuget.targets
+packages/
+*.lock.json
+
+## ASP.NET / .NET Core
+project.lock.json
+project.fragment.lock.json
+Properties/launchSettings.json  # local debug settings
+
+## Logs & temp files
+*.log
+*.tlog
+*.svclog
+*.pid
+*.tmp
+*.temp
+*.bak
+*.swp
+
+## Secrets & environment
+.env
+.env.*             # e.g., .env.development, .env.production
+secrets.json
+appsettings.Development.json
+appsettings.*.local.json
+
+## Test output & coverage
+TestResults/
+*.coverage
+*.coveragexml
+*.trx
+*.coverlet.json
+*.lcov
+
+## Publish metadata
+*.pubxml
+*.pubxml.user
+*.Publish.xml
+*.deploy*
+
+## Rider / JetBrains
+.idea/
+*.iml
+
+## OS-specific
+.DS_Store
+Thumbs.db
+desktop.ini
