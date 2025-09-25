@@ -1,0 +1,10 @@
+{
+  "name": "event-management-monorepo",
+  "private": true,
+  "devDependencies": {
+    "openapi-typescript": "^7.4.3"
+  },
+  "scripts": {
+    "dto:gen": "openapi-typescript ./tools/dto-sync/openapi.json -o ./frontend/app/src/app/dto/api-types.ts"
+  }
+}
