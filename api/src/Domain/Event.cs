@@ -1,6 +1,14 @@
 namespace EventManagement.Domain;
 
-public class Event
+public interface IEvent
+{
+    string Title { get; }
+    string Description { get; }
+    DateTimeOffset Date { get; }
+    int MaxCapacity { get; }
+}
+
+public class Event : IEvent
 {
     public Guid Id { get; private set; }
     public string Title { get; private set; }
