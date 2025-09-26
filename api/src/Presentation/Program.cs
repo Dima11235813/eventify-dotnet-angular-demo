@@ -20,6 +20,7 @@ builder.Services.AddCors(options =>
 // Add application services
 builder.Services.AddScoped<EventManagement.Application.IEventService, EventManagement.Application.EventService>();
 builder.Services.AddSingleton<EventManagement.Infrastructure.IEventStore, EventManagement.Infrastructure.InMemoryEventStore>();
+builder.Services.AddSingleton<EventManagement.Infrastructure.IUserRegistrationStore, EventManagement.Infrastructure.InMemoryUserRegistrationStore>();
 
 // Add controllers
 builder.Services.AddControllers();

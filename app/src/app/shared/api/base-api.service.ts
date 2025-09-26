@@ -1,17 +1,17 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { AppConfigService } from '../config/app-config.service';
+import { APP_CONFIG, AppConfig } from '../config/app-config.model';
 import { LoggingService } from '../logging/logging.service';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 export abstract class BaseApiService {
   protected readonly http = inject(HttpClient);
-  protected readonly config = inject(AppConfigService);
+  protected readonly appConfig = inject<AppConfig>(APP_CONFIG);
   protected readonly logger = inject(LoggingService);
 
   protected url(path: string): string {
-    const base = this.config.apiBaseUrl.replace(/\/$/, '');
+    const base = this.appConfig.api.baseUrl.replace(/\/$/, '');
     const rel = path.startsWith('/') ? path : `/${path}`;
     return `${base}${rel}`;
   }

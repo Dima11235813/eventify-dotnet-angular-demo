@@ -12,4 +12,5 @@ export interface EventDto {
     date?: string;
     maxCapacity?: number;
     registeredCount?: number;
+    isRegistered?: boolean;
 }

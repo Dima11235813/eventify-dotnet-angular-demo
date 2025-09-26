@@ -22,7 +22,71 @@
 
 .event__actions { margin-top: 12px; display: flex; justify-content: flex-end; }
 
+.btn-primary[disabled] { opacity: .6; cursor: not-allowed; }
+.spinner { width: 14px; height: 14px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; display: inline-block; margin-right: 8px; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
 .loading, .error, .empty { padding: 16px 0; color: var(--muted); }
 .error { color: #b91c1c; }
+
+// Loading skeleton styles
+.loading-skeleton {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.skeleton {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-title {
+  height: 18px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+
+.skeleton-desc {
+  height: 40px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.skeleton-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.skeleton-date,
+.skeleton-capacity {
+  height: 12px;
+  background: #e5e7eb;
+  border-radius: 4px;
+}
+
+.skeleton-date { width: 80px; }
+.skeleton-capacity { width: 40px; }
+
+.skeleton-progress {
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 999px;
+}
+
+.skeleton-button {
+  height: 36px;
+  background: #e5e7eb;
+  border-radius: 6px;
+  width: 80px;
+  margin-left: auto;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
 
 

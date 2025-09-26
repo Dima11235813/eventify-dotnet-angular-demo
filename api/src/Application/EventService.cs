@@ -7,22 +7,24 @@ namespace EventManagement.Application;
 public class EventService : IEventService
 {
     private readonly IEventStore _eventStore;
+    private readonly EventManagement.Infrastructure.IUserRegistrationStore _registrationStore;
 
-    public EventService(IEventStore eventStore)
+    public EventService(IEventStore eventStore, EventManagement.Infrastructure.IUserRegistrationStore registrationStore)
     {
         _eventStore = eventStore;
+        _registrationStore = registrationStore;
     }
 
-    public async Task<EventDto?> GetEventByIdAsync(Guid id)
+    public async Task<EventDto?> GetEventByIdAsync(Guid id, string? userId = null)
     {
         var @event = await _eventStore.GetByIdAsync(id);
-        return @event == null ? null : MapToDto(@event);
+        return @event == null ? null : MapToDto(@event, userId);
     }
 
-    public async Task<IEnumerable<EventDto>> GetAllEventsAsync()
+    public async Task<IEnumerable<EventDto>> GetAllEventsAsync(string? userId = null)
     {
         var events = await _eventStore.GetAllAsync();
-        return events.Select(MapToDto);
+        return events.Select(e => MapToDto(e, userId));
     }
 
     public async Task<EventDto> CreateEventAsync(CreateEventDto createEventDto)
@@ -36,7 +38,7 @@ public class EventService : IEventService
         );
 
         await _eventStore.AddAsync(@event);
-        return MapToDto(@event);
+        return MapToDto(@event, null);
     }
 
     public async Task<EventDto> UpdateEventAsync(Guid id, UpdateEventDto updateEventDto)
@@ -53,7 +55,7 @@ public class EventService : IEventService
         );
 
         await _eventStore.UpdateAsync(@event);
-        return MapToDto(@event);
+        return MapToDto(@event, null);
     }
 
     public async Task DeleteEventAsync(Guid id)
@@ -73,6 +75,7 @@ public class EventService : IEventService
 
         @event.RegisterUser(userId);
         await _eventStore.UpdateAsync(@event);
+        await _registrationStore.RegisterAsync(userId, eventId);
     }
 
     public async Task UnregisterFromEventAsync(Guid eventId, string userId)
@@ -83,9 +86,10 @@ public class EventService : IEventService
 
         @event.UnregisterUser(userId);
         await _eventStore.UpdateAsync(@event);
+        await _registrationStore.UnregisterAsync(userId, eventId);
     }
 
-    private static EventDto MapToDto(Event @event)
+    public static EventDto MapToDto(Event @event, string? userId)
     {
         return new EventDto(
             @event.Id,
@@ -93,7 +97,8 @@ public class EventService : IEventService
             @event.Description,
             @event.Date,
             @event.MaxCapacity,
-            @event.RegisteredCount
+            @event.RegisteredCount,
+            userId == null ? false : @event.IsUserRegistered(userId)
         );
     }
 }

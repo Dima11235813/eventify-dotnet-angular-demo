@@ -38,7 +38,7 @@ public class Event : IEvent
         MaxCapacity = maxCapacity;
     }
 
-    public bool CanRegister() => RegisteredCount < MaxCapacity && Date > DateTimeOffset.Now;
+    public bool CanRegister() => RegisteredCount < MaxCapacity && Date > DateTimeOffset.UtcNow;
 
     public bool IsUserRegistered(string userId) => _registrations.Any(r => r.UserId == userId);
 

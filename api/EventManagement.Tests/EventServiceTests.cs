@@ -14,7 +14,7 @@ public class EventServiceTests
     public EventServiceTests()
     {
         _eventStore = new InMemoryEventStore();
-        _eventService = new EventService(_eventStore);
+        _eventService = new EventService(_eventStore, new InMemoryUserRegistrationStore());
     }
 
     [Fact]
@@ -289,5 +289,30 @@ public class EventServiceTests
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _eventService.UnregisterFromEventAsync(createdEvent.Id, "non-registered-user"));
+    }
+
+    [Fact]
+    public async Task GetAllEventsAsync_WithUserContext_PopulatesIsRegistered()
+    {
+        // Arrange
+        var service = new EventService(new InMemoryEventStore(), new InMemoryUserRegistrationStore());
+        var createDto = new CreateEventDto(
+            "User Context Event",
+            "For isRegistered flag",
+            DateTimeOffset.Now.AddDays(7),
+            5
+        );
+        var ev = await service.CreateEventAsync(createDto);
+        var userId = "flag-user";
+
+        await service.RegisterForEventAsync(ev.Id, userId);
+
+        // Act
+        var list = await service.GetAllEventsAsync(userId);
+        var item = list.FirstOrDefault(x => x.Id == ev.Id);
+
+        // Assert
+        Assert.NotNull(item);
+        Assert.True(item!.IsRegistered);
     }
 }

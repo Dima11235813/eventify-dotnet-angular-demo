@@ -17,6 +17,21 @@ public class InMemoryEventStore : IEventStore
             {
                 _events[@event.Id] = (Event)@event;
             }
+
+            // Mark one event as already full for UI testing
+            var toFill = _events.Values.FirstOrDefault(e => e.MaxCapacity <= 5)
+                         ?? _events.Values.OrderBy(e => e.MaxCapacity).FirstOrDefault();
+            if (toFill != null)
+            {
+                var target = Math.Min(toFill.MaxCapacity, 5);
+                for (var i = 0; i < target; i++)
+                {
+                    if (toFill.CanRegister())
+                    {
+                        toFill.RegisterUser($"seed-user-{i}");
+                    }
+                }
+            }
         }
         finally
         {

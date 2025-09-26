@@ -257,11 +257,27 @@ eventify/
 └── .github/workflows/           # CI/CD pipelines
 ```
 
+### 🔜 Roadmap: AuthN/AuthZ
+- Replace mocked `GET /users/me` endpoint with real authentication (OIDC) and authorization roles (admin/user).
+- Remove front-end assumptions about a hard-coded user; the app already initializes by fetching the current user and passes the `userId` to list events so the API can decorate each `EventDto` with `isRegistered` for that user.
+- Extend user context to include permissions and claims for admin features (create/update events).
+
+### 🔜 Roadmap: App Config Validation in CI/CD
+- Publish a typed config contract: `app/src/app/shared/config/app-config.model.ts` (`AppConfig` interface and `APP_CONFIG` token).
+- Add a CI step to validate `app/public/assets/config.json` against `AppConfig` at build time (TypeScript validator) and fail the pipeline on mismatch.
+
+### Style Guide: Runtime App Config (Angular 20)
+- Use `provideAppInitializer` and a `ConfigLoader` to block bootstrap until config is loaded.
+- Expose a single `APP_CONFIG` token and inject it where needed with `inject<AppConfig>(APP_CONFIG)`.
+- Do not inject services that depend on config before initialization; resolve from the loader in the token provider to avoid races.
+
 ### 🤝 Contributing
 
 1. **Backend changes**: Update C# DTOs → Run `npm run dto:generate`
 2. **Frontend changes**: Use generated DTOs for type safety
 3. **New features**: Add tests and update documentation
 4. **Commits**: Pre-commit hooks ensure quality checks
+
+- Important: Do not commit from in-editor assistants (Cursor). Review and commit changes manually from your Git client/terminal.
 
 **Need help?** Check the detailed docs in each feature directory or ask in team chat!

@@ -1,7 +1,22 @@
 <div class="container">
   <h2 class="page-title">Events</h2>
 
-  <div *ngIf="loading()" class="loading">Loading events…</div>
+  <div *ngIf="loading()" class="loading-skeleton">
+    <article class="card event skeleton" *ngFor="let i of [1,2,3,4,5,6]">
+      <div class="event__body">
+        <div class="skeleton-title"></div>
+        <div class="skeleton-desc"></div>
+        <div class="skeleton-meta">
+          <div class="skeleton-date"></div>
+          <div class="skeleton-capacity"></div>
+        </div>
+        <div class="skeleton-progress"></div>
+      </div>
+      <div class="event__actions">
+        <div class="skeleton-button"></div>
+      </div>
+    </article>
+  </div>
   <div *ngIf="error()" class="error">{{ error() }}</div>
 
   <div class="grid" *ngIf="events() as list">
@@ -20,7 +35,15 @@
         </div>
       </div>
       <div class="event__actions">
-        <button class="btn-primary">Register</button>
+        <button
+          class="btn-primary"
+          [disabled]="isBusy(e.id) || (!e.isRegistered && !canRegister(e))"
+          (click)="onRegisterToggle(e)">
+          <span *ngIf="isBusy(e.id)" class="spinner"></span>
+          <ng-container *ngIf="!isBusy(e.id)">
+            {{ labelFor(e) }}
+          </ng-container>
+        </button>
       </div>
     </article>
   </div>

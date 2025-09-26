@@ -16,16 +16,16 @@ public class EventsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllEvents()
+    public async Task<IActionResult> GetAllEvents([FromQuery] string? userId)
     {
-        var events = await _eventService.GetAllEventsAsync();
+        var events = await _eventService.GetAllEventsAsync(userId);
         return Ok(events);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetEventById(Guid id)
+    public async Task<IActionResult> GetEventById(Guid id, [FromQuery] string? userId)
     {
-        var @event = await _eventService.GetEventByIdAsync(id);
+        var @event = await _eventService.GetEventByIdAsync(id, userId);
         if (@event == null)
             return NotFound();
 

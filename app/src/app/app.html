@@ -11,6 +11,14 @@
 
 <router-outlet />
 
+<!-- Simple toast outlet -->
+<div class="toast-outlet" *ngIf="toast.messages().length">
+  <div class="toast" *ngFor="let m of toast.messages()" [class.success]="m.type==='success'" [class.error]="m.type==='error'">
+    {{ m.text }}
+  </div>
+  
+</div>
+
 <footer class="footer">
   <div class="container">© {{ currentYear }} Eventify</div>
 </footer>

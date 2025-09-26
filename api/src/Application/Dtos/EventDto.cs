@@ -6,5 +6,6 @@ public record EventDto(
     string? Description,
     DateTimeOffset Date,
     int MaxCapacity,
-    int RegisteredCount
+    int RegisteredCount,
+    bool IsRegistered
 );
