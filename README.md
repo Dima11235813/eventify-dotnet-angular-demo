@@ -1,5 +1,21 @@
 # Eventify
 
+Event management system with comprehensive event CRUD operations and user registration functionality.
+
+## Architecture
+
+- **Backend**: .NET 9 Web API with Clean Architecture (Domain/Application/Infrastructure/Presentation layers)
+- **Frontend**: Angular application with TypeScript DTOs auto-generated from OpenAPI spec
+- **Features**: Event management, user registration/unregistration, business rule validation
+
+## Key Capabilities
+
+- ✅ Complete event lifecycle management (CRUD operations)
+- ✅ User registration system with business rules (capacity limits, past event prevention, duplicate prevention)
+- ✅ Comprehensive unit test coverage
+- ✅ Monorepo setup with automated DTO synchronization
+- ✅ Clean Architecture principles
+
 ## Monorepo
 
 Single source of truth for data transfer objects, updates in BE auto update FE and CI-CD can be updated to ensure deployment breaks if FE doesn't build.

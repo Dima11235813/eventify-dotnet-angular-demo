@@ -1,0 +1,13 @@
+{
+  "api": {
+    "baseUrl": "http://localhost:5146",
+    "httpsBaseUrl": "https://localhost:7013",
+    "version": "v1",
+    "endpoints": {
+      "events": "/events",
+      "eventById": "/events/{id}",
+      "register": "/events/{id}/register"
+    }
+  },
+  "environment": "development"
+}

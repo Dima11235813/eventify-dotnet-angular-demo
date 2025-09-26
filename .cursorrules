@@ -1,0 +1,62 @@
+# Eventify Project Rules
+
+## API Development Guidelines
+
+### Running the API
+- The EventManagement API should be run from Visual Studio or using `dotnet run --project api/src/Presentation/EventManagement.Presentation.csproj` from the project root
+- The API runs on:
+  - HTTP: http://localhost:5146
+  - HTTPS: https://localhost:7013 (requires trusting self-signed certificate)
+- **IMPORTANT**: If API endpoints return connection refused errors, prompt the user to run the API in Visual Studio first
+- Swagger UI is available at http://localhost:5146/swagger when the API is running
+
+### HTTPS Development Certificate
+- For HTTPS development, run `dotnet dev-certs https --trust` in an elevated command prompt
+- If browsers show certificate errors, manually trust the certificate by visiting https://localhost:7013
+
+### API Endpoints
+- GET /events - List all events
+- POST /events - Create new event
+- GET /events/{id} - Get event by ID
+- PUT /events/{id} - Update event
+- POST /events/{id}/register - Register for event
+- DELETE /events/{id}/register - Unregister from event
+
+### Frontend Configuration
+- Frontend API configuration is in `app/src/assets/config.json`
+- Contains base URLs and endpoint paths for API communication
+
+### CORS Configuration
+- API allows CORS from Angular app (port 4200) and Swagger UI (ports 5146/7013)
+- CORS origins configured in `api/src/Presentation/appsettings.json`
+- Update CORS settings when adding new frontend environments
+
+### Testing
+- Run unit tests with `dotnet test` from the api directory
+- API includes comprehensive test coverage for all layers
+
+## Code Quality Standards
+
+### Clean Architecture
+- Follow Clean Architecture principles with Domain, Application, Infrastructure, and Presentation layers
+- Keep domain entities and business logic separate from infrastructure concerns
+
+### Error Handling
+- Use appropriate HTTP status codes
+- Include meaningful error messages in API responses
+
+### Documentation
+- Keep README.md updated with current API details and setup instructions
+- Use Swagger annotations for API documentation
+
+## Development Workflow
+
+### Before Making Changes
+- Ensure the API is running and accessible
+- Check that tests pass before and after changes
+- Update documentation when adding new endpoints or changing existing ones
+
+### Building and Running
+- Use `dotnet build` to build the solution
+- Use `dotnet run --project api/src/Presentation/EventManagement.Presentation.csproj` to run the API
+- For full debugging, use Visual Studio's built-in run/debug features
