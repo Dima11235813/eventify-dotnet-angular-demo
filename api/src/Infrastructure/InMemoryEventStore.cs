@@ -18,17 +18,37 @@ public class InMemoryEventStore : IEventStore
                 _events[@event.Id] = (Event)@event;
             }
 
-            // Mark one event as already full for UI testing
-            var toFill = _events.Values.FirstOrDefault(e => e.MaxCapacity <= 5)
-                         ?? _events.Values.OrderBy(e => e.MaxCapacity).FirstOrDefault();
-            if (toFill != null)
+            // Seed registrations: among FUTURE-dated events, make half fully booked and half with one spot left
+            var futureSeedTargets = _events.Values
+                .Where(e => e.Date > DateTimeOffset.UtcNow && e.MaxCapacity > 0)
+                .OrderBy(e => e.Date)
+                .ToList();
+
+            if (futureSeedTargets.Count > 0)
             {
-                var target = Math.Min(toFill.MaxCapacity, 5);
-                for (var i = 0; i < target; i++)
+                var half = futureSeedTargets.Count / 2;
+
+                // First half: fill to capacity
+                for (var i = 0; i < half; i++)
                 {
-                    if (toFill.CanRegister())
+                    var e = futureSeedTargets[i];
+                    var target = e.MaxCapacity;
+                    for (var n = 0; n < target; n++)
                     {
-                        toFill.RegisterUser($"seed-user-{i}");
+                        if (!e.CanRegister()) break;
+                        e.RegisterUser($"seed-full-{i}-{n}");
+                    }
+                }
+
+                // Second half: leave exactly one spot
+                for (var i = half; i < futureSeedTargets.Count; i++)
+                {
+                    var e = futureSeedTargets[i];
+                    var target = Math.Max(0, e.MaxCapacity - 1);
+                    for (var n = 0; n < target; n++)
+                    {
+                        if (!e.CanRegister()) break;
+                        e.RegisterUser($"seed-oneleft-{i}-{n}");
                     }
                 }
             }

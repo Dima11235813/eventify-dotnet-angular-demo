@@ -79,6 +79,55 @@ CORS settings are configured in `appsettings.json` under the `Cors.AllowedOrigin
 - `POST /events/{id}/register` - Register for an event
 - `DELETE /events/{id}/register` - Unregister from an event
 
+## cURL examples for registration rules
+
+Ensure the API is running first. Base URL in these examples is `http://localhost:5146`.
+
+1) List events and inspect capacity vs registrations
+
+```bash
+curl -s http://localhost:5146/events | jq '.[].{"id": .id, title: .title, date: .date, max: .maxCapacity, registered: .registeredCount}'
+```
+
+2) Attempt to register for a full event (expect HTTP 400)
+
+```bash
+# Replace EVENT_ID with an event where registeredCount == maxCapacity
+curl -i -X POST http://localhost:5146/events/EVENT_ID/register \
+  -H "Content-Type: application/json" \
+  -d '{"userId":"demo-user-123"}'
+```
+
+3) Attempt to register for a past event (expect HTTP 400)
+
+```bash
+# Replace EVENT_ID with an event whose date is in the past
+curl -i -X POST http://localhost:5146/events/EVENT_ID/register \
+  -H "Content-Type: application/json" \
+  -d '{"userId":"demo-user-123"}'
+```
+
+4) Successful registration when there is capacity and the event is in the future (expect HTTP 200)
+
+```bash
+# Replace EVENT_ID with a future event where registeredCount < maxCapacity
+curl -i -X POST http://localhost:5146/events/EVENT_ID/register \
+  -H "Content-Type: application/json" \
+  -d '{"userId":"demo-user-123"}'
+```
+
+5) Unregister from an event (expect HTTP 200 if previously registered)
+
+```bash
+curl -i -X DELETE http://localhost:5146/events/EVENT_ID/register \
+  -H "Content-Type: application/json" \
+  -d '{"userId":"demo-user-123"}'
+```
+
+Notes:
+- The API returns 400 Bad Request with a helpful message when rules are violated (e.g., full event or past event).
+- Use `GET /events?userId=demo-user-123` to see the `isRegistered` flag populated for that user.
+
 ## API Documentation
 
 The API uses Swagger/OpenAPI for interactive documentation and testing.
@@ -113,6 +162,29 @@ The OpenAPI specification is available at:
 - **Schema Documentation**: View detailed request/response schemas
 - **Authentication**: (Future implementation)
 - **API Versioning**: Current version v1
+
+## Roadmap: EF Core persistence and relational schema
+
+We will migrate from in-memory stores to EF Core with a relational schema to preserve domain rules via referential integrity:
+
+- Tables:
+  - `Users` (Id PK, Name, Email)
+  - `Events` (Id PK, Title, Description, Date, MaxCapacity)
+  - `Registrations` (EventId FK -> Events.Id, UserId FK -> Users.Id, CreatedAt)
+- Keys and constraints:
+  - Composite PK on (`EventId`,`UserId`) in `Registrations` to prevent duplicates
+  - Foreign keys with cascade rules as appropriate
+  - Unique index on (`EventId`,`UserId`)
+- Relationships:
+  - One `User` has many `Registrations`
+  - One `Event` has many `Registrations`
+  - Many-to-many between `Users` and `Events` through `Registrations`
+
+Initial migration plan:
+1. Introduce DbContext and entity configurations (Fluent API)
+2. Add migrations and local SQL provider (SQLite or SQL Server)
+3. Replace `InMemoryEventStore`/`InMemoryUserRegistrationStore` with EF Core repositories
+4. Preserve business rules both in domain logic and at the database level (constraints)
 
 ### DTO Types
 

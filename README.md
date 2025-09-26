@@ -281,3 +281,12 @@ eventify/
 - Important: Do not commit from in-editor assistants (Cursor). Review and commit changes manually from your Git client/terminal.
 
 **Need help?** Check the detailed docs in each feature directory or ask in team chat!
+
+### 🔜 Roadmap: EF Core Persistence for Registrations
+
+We'll migrate to EF Core with a relational schema to persist users, events, and registrations while enforcing domain rules via constraints.
+
+- **Entities**: `User`, `Event`, `Registration`
+- **Relationships**: One user has many registrations; one event has many registrations; many-to-many via `Registration`
+- **Constraints**: Composite key/unique index on (`EventId`,`UserId`) to prevent duplicate registrations
+- **Plan**: Introduce DbContext and mappings, add migrations (SQLite/SQL Server), replace in-memory stores with EF repositories
