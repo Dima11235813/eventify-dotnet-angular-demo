@@ -24,6 +24,8 @@ export class AppConfigService {
     this.http = http;
   }
 
+  // Note: APP_INITIALIZER is deprecated in v20 in favor of withAppInitializer.
+  // We'll keep this shape for now and migrate when re-enabling SSR/hydration.
   load(): Promise<void> {
     return new Promise((resolve) => {
       this.http.get<unknown>('assets/config.json').subscribe({
@@ -32,7 +34,6 @@ export class AppConfigService {
           resolve();
         },
         error: () => {
-          // Fallback to dev defaults if config missing
           this.config.set(this.defaultConfig());
           resolve();
         }

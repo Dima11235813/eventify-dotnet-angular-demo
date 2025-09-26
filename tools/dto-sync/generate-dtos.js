@@ -31,7 +31,8 @@ const config = {
         serviceFileSuffix: 'Service',
         serviceSuffix: 'Service',
         modelFileSuffix: '',
-        modelSuffix: 'Dto',
+        // Avoid double-suffix names like CreateEventDtoDto by leaving suffix empty.
+        modelSuffix: '',
         stringEnums: true,
         enumPropertyNaming: 'UPPERCASE',
         fileNaming: 'camelCase'
@@ -57,7 +58,7 @@ function generateDTOs() {
 
     try {
         // Check if API is running by testing the swagger endpoint
-        execSync(`curl -f -s "${config.inputSpec}" > /dev/null`, { stdio: 'inherit' });
+        execSync(`curl -f -s "${config.inputSpec}" > /dev/null`);
         console.log('✅ API is accessible');
 
         if (USE_DOCKER) {
@@ -78,6 +79,11 @@ function generateDTOs() {
         console.log(`📁 Check generated files in: ${OUTPUT_DIR}`);
 
     } catch (error) {
+        const allowOffline = process.env.ALLOW_DTO_OFFLINE !== 'false';
+        if (allowOffline) {
+            console.warn('⚠️  Swagger endpoint not reachable. Skipping DTO generation and using existing files.');
+            return;
+        }
         console.error('❌ Failed to generate DTOs:', error.message);
         console.error('💡 Make sure the API is running and accessible at:', API_URL);
         if (!USE_DOCKER) {
@@ -90,17 +96,18 @@ function generateDTOs() {
 function generateWithDocker() {
     console.log('🐳 Generating with Docker...');
 
-    const dockerCmd = `docker run --rm \\
-        -v "${OUTPUT_DIR}:/app/output" \\
-        openapitools/openapi-generator-cli:latest \\
-        generate \\
-        --input-spec "${config.inputSpec}" \\
-        --generator-name "${config.generatorName}" \\
-        --output "/app/output" \\
-        --additional-properties "${Object.entries(config.additionalProperties).map(([k, v]) => `${k}=${v}`).join(',')}" \\
-        --global-property "${Object.entries(config.globalProperty).map(([k, v]) => `${k}=${v}`).join(',')}" \\
-        --type-mappings "${Object.entries(config.typeMappings).map(([k, v]) => `${k}:${v}`).join(',')}" \\
-        --skip-validate-spec`;
+    const additionalProps = Object.entries(config.additionalProperties)
+        .map(([k, v]) => `${k}=${v}`).join(',');
+    const globalProps = Object.entries(config.globalProperty)
+        .map(([k, v]) => `${k}=${v}`).join(',');
+    const typeMappings = Object.entries(config.typeMappings)
+        .map(([k, v]) => `${k}:${v}`).join(',');
+
+    // Inside Docker, "localhost" points to the container, not the host. Use host.docker.internal instead.
+    const inputSpecForDocker = config.inputSpec.replace('http://localhost', 'http://host.docker.internal');
+
+    // Use a single-line docker command for cross-shell compatibility (PowerShell/CMD/Bash)
+    const dockerCmd = `docker run --rm -v "${OUTPUT_DIR}:/app/output" openapitools/openapi-generator-cli:latest generate --input-spec "${inputSpecForDocker}" --generator-name "${config.generatorName}" --output "/app/output" --additional-properties "${additionalProps}" --global-property "${globalProps}" --type-mappings "${typeMappings}" --skip-validate-spec`;
 
     execSync(dockerCmd, { stdio: 'inherit', cwd: process.cwd() });
 }
@@ -122,17 +129,18 @@ function generateWithLocalCLI() {
 }
 
 function cleanupGeneratedFiles() {
+    // Keep essential runtime files (configuration.ts, encoder.ts, variables.ts, param.ts, index.ts)
+    // Only remove metadata and packaging files we don't ship in the app bundle.
     const filesToRemove = [
         'api.module.ts',
-        'configuration.ts',
-        'encoder.ts',
-        'index.ts', // We'll create our own
-        'param.ts',
-        'variables.ts',
         '.openapi-generator',
         '.openapi-generator-ignore',
         'git_push.sh',
-        '.gitignore'
+        '.gitignore',
+        'README.md',
+        'ng-package.json',
+        'package.json',
+        'tsconfig.json'
     ];
 
     filesToRemove.forEach(file => {
@@ -148,22 +156,8 @@ function cleanupGeneratedFiles() {
 }
 
 function createIndexFile() {
-    const modelDir = path.join(OUTPUT_DIR, 'model');
-    if (!fs.existsSync(modelDir)) {
-        console.warn('⚠️  Model directory not found, skipping index.ts creation');
-        return;
-    }
-
-    const files = fs.readdirSync(modelDir)
-        .filter(file => file.endsWith('.ts') && !file.endsWith('.spec.ts'))
-        .map(file => file.replace('.ts', ''));
-
-    const indexContent = files
-        .map(file => `export * from './model/${file}';`)
-        .join('\n');
-
-    fs.writeFileSync(path.join(OUTPUT_DIR, 'index.ts'), indexContent + '\n');
-    console.log('📝 Created index.ts for clean imports');
+    // The generator already emits an index.ts; leave it intact.
+    console.log('ℹ️  Using generator-provided index.ts');
 }
 
 // Check for watch mode

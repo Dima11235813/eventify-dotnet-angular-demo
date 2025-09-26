@@ -1,7 +1,6 @@
-// Auto-generated TypeScript interfaces from C# DTOs
-// Generated from EventManagement API OpenAPI specification
-
-export * from './model/createEventDto';
-export * from './model/eventDto';
-export * from './model/registrationDto';
-export * from './model/updateEventDto';
+export * from './api/api';
+export * from './model/models';
+export * from './variables';
+export * from './configuration';
+export * from './provide-api';
+export * from './param';

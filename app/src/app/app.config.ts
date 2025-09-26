@@ -1,6 +1,6 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideHttpClient, withInterceptors, withFetch } from '@angular/common/http';
 import { APP_INITIALIZER } from '@angular/core';
 import { AppConfigService } from './shared/config/app-config.service';
 
@@ -12,8 +12,10 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes),
-    provideClientHydration(withEventReplay()),
-    provideHttpClient(withInterceptors([])),
+    // TODO(SSR): Re-enable hydration when SSR is turned back on.
+    // We are temporarily disabling SSR to isolate issues around config loading and APP_INITIALIZER deprecation.
+    // provideClientHydration(withEventReplay()),
+    provideHttpClient(withInterceptors([]), withFetch()),
     AppConfigService,
     {
       provide: APP_INITIALIZER,

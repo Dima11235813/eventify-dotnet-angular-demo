@@ -11,7 +11,8 @@
     "build:frontend": "cd app && npm run build",
     "dto:generate": "cd app && npm run dto:generate",
     "dto:generate:docker": "docker-compose -f tools/dto-sync/docker-compose.yml up dto-sync",
-    "start": "npm run start:api & npm run start:frontend",
+    "start": "concurrently -k -n api,web -c green,blue \"npm run start:api\" \"npm run start:frontend\"",
+    "prestart": "npm run dto:generate",
     "start:api": "cd api/src/Presentation && dotnet run",
     "start:frontend": "cd app && npm start",
     "test": "npm run test:api && npm run test:frontend",
@@ -30,6 +31,6 @@
     "tools/dto-sync"
   ],
   "devDependencies": {
-    "concurrently": "^8.2.0"
+    "concurrently": "^8.2.2"
   }
 }
