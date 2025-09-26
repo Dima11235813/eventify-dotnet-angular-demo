@@ -7,7 +7,10 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:web": "node dist/web/server/server.mjs"
+    "serve:ssr:web": "node dist/web/server/server.mjs",
+    "dto:generate": "node ../../tools/dto-sync/generate-dtos.js",
+    "dto:generate:docker": "docker-compose -f ../../tools/dto-sync/docker-compose.yml up dto-sync",
+    "prebuild": "npm run dto:generate"
   },
   "prettier": {
     "printWidth": 100,

@@ -1,0 +1,31 @@
+<div class="container">
+  <h2 class="page-title">Events</h2>
+
+  <div *ngIf="loading()" class="loading">Loading events…</div>
+  <div *ngIf="error()" class="error">{{ error() }}</div>
+
+  <div class="grid" *ngIf="events() as list">
+    <article class="card event" *ngFor="let e of list">
+      <div class="event__body">
+        <h3>{{ e.title }}</h3>
+        <p class="desc">{{ e.description }}</p>
+        <div class="meta">
+          <span class="date">{{ e.date | date: 'MMM d, y, h:mm a' }}</span>
+          <span class="capacity">
+            {{ e.registeredCount }}/{{ e.maxCapacity }}
+          </span>
+        </div>
+        <div class="progress">
+          <div class="bar" [style.width.%]="(e.registeredCount / e.maxCapacity) * 100"></div>
+        </div>
+      </div>
+      <div class="event__actions">
+        <button class="btn-primary">Register</button>
+      </div>
+    </article>
+  </div>
+
+  <div class="empty" *ngIf="events() && events()!.length === 0">No events yet.</div>
+</div>
+
+

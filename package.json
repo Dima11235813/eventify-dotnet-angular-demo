@@ -1,10 +1,35 @@
 {
-  "name": "event-management-monorepo",
-  "private": true,
-  "devDependencies": {
-    "openapi-typescript": "^7.4.3"
-  },
+  "name": "eventify-monorepo",
+  "version": "1.0.0",
+  "description": "Eventify - Event Management Platform",
   "scripts": {
-    "dto:gen": "openapi-typescript ./tools/dto-sync/openapi.json -o ./frontend/app/src/app/dto/api-types.ts"
+    "install:all": "npm run install:api && npm run install:frontend",
+    "install:api": "cd api && dotnet restore",
+    "install:frontend": "cd app && npm install",
+    "build": "npm run build:api && npm run dto:generate && npm run build:frontend",
+    "build:api": "cd api && dotnet build --configuration Release",
+    "build:frontend": "cd app && npm run build",
+    "dto:generate": "cd app && npm run dto:generate",
+    "dto:generate:docker": "docker-compose -f tools/dto-sync/docker-compose.yml up dto-sync",
+    "start": "npm run start:api & npm run start:frontend",
+    "start:api": "cd api/src/Presentation && dotnet run",
+    "start:frontend": "cd app && npm start",
+    "test": "npm run test:api && npm run test:frontend",
+    "test:api": "cd api && dotnet test",
+    "test:frontend": "cd app && npm test",
+    "docker:build": "docker-compose -f docker-compose.dev.yml build",
+    "docker:up": "docker-compose -f docker-compose.dev.yml up -d",
+    "docker:down": "docker-compose -f docker-compose.dev.yml down",
+    "docker:dev": "npm run docker:build && npm run docker:up",
+    "clean": "npm run clean:api && npm run clean:frontend",
+    "clean:api": "cd api && dotnet clean",
+    "clean:frontend": "cd app && rm -rf node_modules dist"
+  },
+  "workspaces": [
+    "app",
+    "tools/dto-sync"
+  ],
+  "devDependencies": {
+    "concurrently": "^8.2.0"
   }
 }

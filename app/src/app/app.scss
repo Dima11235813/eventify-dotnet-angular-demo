@@ -1,0 +1,29 @@
+/* App Shell */
+.navbar {
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	background: var(--card, #fff);
+	border-bottom: 1px solid var(--border, #e5e7eb);
+}
+
+.nav__inner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	height: 56px;
+}
+
+.brand { font-weight: 700; }
+.links {
+	display: flex;
+	gap: 16px;
+}
+.links a { text-decoration: none; color: var(--gray-700, #6b7280); padding: 6px 8px; border-radius: 8px; }
+.links a.active { color: var(--bright-blue, #2563eb); background: rgba(37,99,235,.08); }
+.links a.disabled { opacity: .5; pointer-events: none; }
+
+.footer {
+	padding: 24px 0;
+	color: var(--gray-700, #6b7280);
+}

@@ -1,3 +1,13 @@
 import { Routes } from '@angular/router';
 
-export const routes: Routes = [];
+export const routes: Routes = [
+  {
+    path: '',
+    loadComponent: () => import('./home/home.component').then(m => m.HomeComponent)
+  },
+  {
+    path: 'events',
+    loadComponent: () => import('./events/events-list.component').then(m => m.EventsListComponent)
+  },
+  { path: '**', redirectTo: '' }
+];

@@ -96,6 +96,24 @@ export class EventService {
 }
 ```
 
+### Frontend API Configuration & DRY Pattern
+
+- Runtime config is loaded from `app/src/assets/config.json` at startup via `AppConfigService` using `APP_INITIALIZER`.
+- Feature services use a shared `BaseApiService` to eliminate repeated base URL building, params/headers handling, and error/log plumbing.
+- `LoggingService` is consumed by the base service so all requests and failures are logged centrally.
+
+Key files:
+- `app/src/app/shared/config/app-config.service.ts`
+- `app/src/app/shared/api/base-api.service.ts`
+- `app/src/app/shared/api/event.service.ts`
+- `app/src/app/shared/logging/logging.service.ts`
+- `app/src/assets/config.json`
+
+Benefits:
+- Don’t Repeat Yourself (DRY)
+- Single source of truth for API endpoints
+- Centralized logging and error handling
+
 #### Before Committing
 Pre-commit hooks automatically verify DTO synchronization:
 
