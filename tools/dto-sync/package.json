@@ -1,0 +1,17 @@
+{
+  "name": "@eventify/dto-sync",
+  "version": "1.0.0",
+  "description": "DTO synchronization tool for Eventify",
+  "main": "generate-dtos.js",
+  "scripts": {
+    "generate": "node generate-dtos.js",
+    "generate:watch": "node generate-dtos.js --watch"
+  },
+  "dependencies": {
+    "@openapitools/openapi-generator-cli": "^2.13.4",
+    "chokidar": "^3.5.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

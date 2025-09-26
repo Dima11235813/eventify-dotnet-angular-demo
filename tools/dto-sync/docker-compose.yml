@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  dto-sync:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../../app/src/app/shared/dto:/app/output
+    environment:
+      - API_URL=http://host.docker.internal:5146
+    networks:
+      - eventify-network
+    command: ["node", "generate-dtos.js"]
+
+networks:
+  eventify-network:
+    external: true
+    name: eventify_default
