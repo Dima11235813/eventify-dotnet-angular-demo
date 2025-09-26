@@ -64,6 +64,24 @@ public class EventsController : ControllerBase
         }
     }
 
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteEvent(Guid id)
+    {
+        try
+        {
+            await _eventService.DeleteEventAsync(id);
+            return NoContent();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
     [HttpPost("{id}/register")]
     public async Task<IActionResult> RegisterForEvent(Guid id, [FromBody] RegistrationDto registrationDto)
     {

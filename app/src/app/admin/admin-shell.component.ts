@@ -14,8 +14,8 @@ import { PageLoaderService } from '../shared/ui/page-loader.service';
           <h3>Admin Panel</h3>
           <nav class="links">
             <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Dashboard</a>
-            <a routerLink="/admin/events/new" routerLinkActive="active">Create Event</a>
-            <a routerLink="/admin/events" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">Manage Events</a>
+            <a routerLink="/admin/events/new" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Create Event</a>
+            <a routerLink="/admin/events" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Manage Events</a>
             <a class="disabled" aria-disabled="true">Reports <small>Soon</small></a>
           </nav>
         </div>
@@ -41,7 +41,7 @@ import { PageLoaderService } from '../shared/ui/page-loader.service';
   ,
   styles: [
     `.admin-shell{display:grid;grid-template-columns:260px 1fr;gap:24px;width:100vw;box-sizing:border-box}`,
-    `.admin-sidebar{padding:16px;background:#f3f4f6;min-height:calc(100vh - 56px);}`,
+    `.admin-sidebar{padding:0 16px;background:#f3f4f6;min-height:calc(100vh - 56px);}`,
     `.admin-sidebar .admin-card:first-child{margin-top:24px;}`,
     `.admin-main{padding:24px 48px;}`,
     `.admin-card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;box-shadow:0 1px 2px rgba(0,0,0,.04);}`,

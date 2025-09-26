@@ -304,3 +304,39 @@ We'll migrate to EF Core with a relational schema to persist users, events, and 
 - **Relationships**: One user has many registrations; one event has many registrations; many-to-many via `Registration`
 - **Constraints**: Composite key/unique index on (`EventId`,`UserId`) to prevent duplicate registrations
 - **Plan**: Introduce DbContext and mappings, add migrations (SQLite/SQL Server), replace in-memory stores with EF repositories
+
+## Frontend & Admin UI Style Guide (Summary)
+
+- Layout uses a fixed 260 px light-gray admin sidebar and a main content area with ~48 px side padding and ~32 px vertical spacing between sections.
+- Cards are white with 12 px rounded corners, soft shadow, and subtle borders.
+- Typography: 28 px page headings, 16 px body text, 12 px labels.
+- KPI and table cards follow consistent spacing and pill styles; action buttons use compact circular icon buttons.
+- Responsive: KPI and form grids stack at <900 px; tables scroll horizontally in small viewports.
+- Loading: pages show a skeleton overlay while API calls are in flight; routed content remains mounted to avoid re-fetch loops.
+
+## Routing and Links
+
+- Home “Create Event” CTA routes to ` /admin/events/new `.
+- Admin sidebar links are mutually exclusive via exact `routerLinkActive` settings so only one appears active based on URL.
+
+## API Usage Policy
+
+- No polling is used. Components fetch once on init or when explicitly triggered by user actions.
+- The admin shell keeps the `router-outlet` mounted and overlays a skeleton to prevent repeated calls caused by component teardown.
+
+## MVP Authorization & Roadmap
+
+- MVP: Delete endpoint is allowed for convenience and UI shows edit/delete actions.
+- Roadmap:
+  - Introduce role-based authorization attributes on backend endpoints (e.g., Admin can create/update/delete; User can register/unregister; Anonymous can only read).
+  - Conditional UI rendering based on auth state:
+    - Anonymous: can browse events only.
+    - Authenticated user: can browse and register/unregister.
+    - Admin: sees Admin navigation, can manage events, and edit/delete.
+  - Hide admin navigation when the user is not an admin.
+
+## Running the API and App
+
+- API: run via `dotnet run --project api/src/Presentation/EventManagement.Presentation.csproj` (HTTP: 5146, HTTPS: 7013). Trust dev cert if needed.
+- Web: from `app/`, run `npm start` and open `http://localhost:4200`.
+- Swagger: `http://localhost:5146/swagger`.
