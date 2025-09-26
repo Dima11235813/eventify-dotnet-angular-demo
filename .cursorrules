@@ -31,6 +31,14 @@
 - CORS origins configured in `api/src/Presentation/appsettings.json`
 - Update CORS settings when adding new frontend environments
 
+### DTO Synchronization
+- TypeScript interfaces auto-generated from C# DTOs using OpenAPI spec
+- Generated files in `app/src/app/shared/dto/`
+- Run `npm run dto:generate` after changing C# DTOs
+- Pre-commit hooks verify DTO synchronization
+- CI/CD automatically generates and verifies DTOs
+- Use Docker for consistent generation: `npm run dto:generate:docker`
+
 ### Testing
 - Run unit tests with `dotnet test` from the api directory
 - API includes comprehensive test coverage for all layers

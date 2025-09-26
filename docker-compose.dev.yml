@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # API Service
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "5146:80"
+      - "7013:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80;https://+:443
+    volumes:
+      - ./api:/app
+      - /app/bin
+      - /app/obj
+    networks:
+      - eventify-network
+    depends_on:
+      - db
+
+  # Database (for future use)
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=eventify
+      - POSTGRES_USER=eventify
+      - POSTGRES_PASSWORD=devpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - eventify-network
+
+  # DTO Sync Tool
+  dto-sync:
+    build:
+      context: ./tools/dto-sync
+      dockerfile: Dockerfile
+    volumes:
+      - ./app/src/app/shared/dto:/app/output
+      - /app/node_modules
+    environment:
+      - API_URL=http://api:80
+    networks:
+      - eventify-network
+    depends_on:
+      - api
+    command: ["node", "generate-dtos.js"]
+
+volumes:
+  postgres_data:
+
+networks:
+  eventify-network:
+    driver: bridge

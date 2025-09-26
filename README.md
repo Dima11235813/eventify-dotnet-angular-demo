@@ -16,79 +16,234 @@ Event management system with comprehensive event CRUD operations and user regist
 - ✅ Monorepo setup with automated DTO synchronization
 - ✅ Clean Architecture principles
 
-## Monorepo
+## 🚀 Onboarding
 
-Single source of truth for data transfer objects, updates in BE auto update FE and CI-CD can be updated to ensure deployment breaks if FE doesn't build.
+Welcome to Eventify! This guide will help you get started with development on our event management platform.
 
-Positive side, mitigates misaligned DTO contract.
-Downside, requires front end and back end changes that involve DTO schema changes to deploy together.
+### Prerequisites
 
+- **Node.js 18+** - Required for frontend and tooling
+- **.NET 9 SDK** - Required for backend API
+- **Docker** (optional but recommended) - For consistent DTO generation
+- **Git** - Version control
+
+### Quick Start
+
+1. **Clone and setup:**
+   ```bash
+   git clone <repository-url>
+   cd eventify
+   npm run install:all  # Installs all dependencies
+   ```
+
+2. **Start development environment:**
+   ```bash
+   npm start  # Starts API + Frontend + auto-generates DTOs
+   ```
+
+3. **Verify setup:**
+   - API: http://localhost:5146/swagger
+   - Frontend: http://localhost:4200
+   - DTOs: `app/src/app/shared/dto/`
+
+### 🏗️ Architecture Overview
+
+Eventify uses a **monorepo** structure with automated DTO synchronization:
+
+- **Backend**: .NET 9 Web API (Clean Architecture)
+- **Frontend**: Angular with auto-generated TypeScript interfaces
+- **DTO Sync**: Single source of truth ensures type safety across full stack
+
+### 📋 Daily Development Workflow
+
+#### Starting Your Day
 ```bash
-# Build backend (emits openapi.json via MSBuild Target), then generate TS DTOs
-dotnet build ./backend/src/Presentation/EventManagement.Presentation.csproj -c Debug
+# Start everything at once
+npm start
 
-npm run dto:gen
+# Or start components separately
+npm run start:api      # API on http://localhost:5146
+npm run start:frontend # Angular on http://localhost:4200
 ```
 
-TODO integrate into github PR review hooks.
+#### Backend Changes (C# DTOs)
+When modifying `api/src/Application/Dtos/`:
 
+1. **Update C# DTOs** in `api/src/Application/Dtos/`
+2. **Generate TypeScript interfaces:**
+   ```bash
+   npm run dto:generate
+   ```
+3. **Frontend gets type-safe interfaces** in `app/src/app/shared/dto/`
 
-### FE usage
+#### Frontend Development
+Use auto-generated DTOs for type safety:
 
-// frontend/app/src/app/features/events/events.service.ts
-import type { paths } from '../../dto/api-types';
-// Example: paths['/events']['get']['responses']['200']['content']['application/json']
+```typescript
+import { EventDto, CreateEventDto } from '../shared/dto';
 
+@Injectable({ providedIn: 'root' })
+export class EventService {
+  constructor(private http: HttpClient) {}
 
-### BE enforement
+  getEvents(): Observable<EventDto[]> {
+    return this.http.get<EventDto[]>('/api/events');
+  }
 
-TODO
+  createEvent(event: CreateEventDto): Observable<EventDto> {
+    return this.http.post<EventDto>('/api/events', event);
+  }
+}
+```
 
-CI: enforce DTO sync on PRs (GitHub Actions)
+#### Before Committing
+Pre-commit hooks automatically verify DTO synchronization:
 
-Create .github/workflows/ci.yml:
+```bash
+git add .
+git commit -m "Your changes"
+# ✅ Pre-commit hook verifies DTOs are in sync
+```
 
-name: CI
+### 🔄 DTO Synchronization
 
-on:
-  pull_request:
-  push:
-    branches: [ main ]
+**How it works:**
+1. C# DTOs → OpenAPI spec (runtime) → TypeScript interfaces
+2. Ensures type safety across backend/frontend boundary
+3. Prevents contract drift between services
 
-jobs:
-  build-test-dto:
-    runs-on: ubuntu-latest
+**Manual generation:**
+```bash
+# Local generation (requires API running)
+npm run dto:generate
 
-    steps:
-      - uses: actions/checkout@v4
+# Docker generation (isolated, recommended)
+npm run dto:generate:docker
+```
 
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
+**Generated files:**
+```
+app/src/app/shared/dto/
+├── index.ts           # Clean imports: import { EventDto } from '../shared/dto'
+└── model/
+    ├── eventDto.ts
+    ├── createEventDto.ts
+    ├── updateEventDto.ts
+    └── registrationDto.ts
+```
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+### 🧪 Testing & Quality
 
-      - name: Install dotnet swagger tool
-        run: dotnet tool install --global Swashbuckle.AspNetCore.Cli
-        env:
-          DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+#### Running Tests
+```bash
+# All tests
+npm test
 
-      - name: Restore & Build Backend
-        run: dotnet build ./backend/src/Presentation/EventManagement.Presentation.csproj -c Release
+# Backend only
+npm run test:api
 
-      - name: Install NPM deps
-        run: npm ci
+# Frontend only
+npm run test:frontend
+```
 
-      - name: Generate DTOs
-        run: npm run dto:gen
+#### Building
+```bash
+# Full build (includes DTO generation)
+npm run build
 
-      - name: Verify no drift
-        run: |
-          if ! git diff --exit-code; then
-            echo "::error::DTOs out of sync. Run 'dotnet build' then 'npm run dto:gen' and commit."
-            exit 1
-          fi
+# Individual builds
+npm run build:api
+npm run build:frontend
+```
 
-      # TODO: add test steps (xUnit, Angular unit/E2E) per PRD
+### 🚢 CI/CD Pipeline
+
+**GitHub Actions** automatically:
+- Builds backend and generates DTOs
+- Builds frontend with generated types
+- Runs all tests
+- Verifies DTO synchronization
+- Fails PRs if DTOs are out of sync
+
+**Local CI simulation:**
+```bash
+npm run build  # Same process as CI/CD
+```
+
+### 🐳 Docker Development
+
+For consistent environments across team:
+
+```bash
+# Full development environment
+npm run docker:dev
+
+# Individual services
+docker-compose -f docker-compose.dev.yml up api
+docker-compose -f docker-compose.dev.yml up dto-sync
+```
+
+### 🔧 Troubleshooting
+
+#### API Won't Start
+```bash
+# Check if port 5146 is available
+netstat -ano | findstr :5146
+
+# Kill process if needed
+taskkill /PID <PID> /F
+
+# Restart
+npm run start:api
+```
+
+#### CORS Errors in Swagger
+API is configured with CORS for development:
+- ✅ Angular: `http://localhost:4200`
+- ✅ Swagger HTTP: `http://localhost:5146`
+- ✅ Swagger HTTPS: `https://localhost:7013`
+
+#### DTO Generation Fails
+```bash
+# Ensure API is running first
+npm run start:api
+
+# Check API health
+curl http://localhost:5146/swagger/v1/swagger.json
+
+# Regenerate
+npm run dto:generate
+```
+
+#### Type Errors After Backend Changes
+```bash
+# Regenerate DTOs after backend changes
+npm run dto:generate
+
+# Rebuild frontend
+npm run build:frontend
+```
+
+### 📚 Key Files & Directories
+
+```
+eventify/
+├── api/                          # .NET Backend
+│   ├── src/Application/Dtos/     # C# DTOs (source of truth)
+│   └── appsettings.json          # CORS configuration
+├── app/                          # Angular Frontend
+│   └── src/app/shared/dto/       # Generated TypeScript interfaces
+├── tools/dto-sync/              # DTO generation tooling
+├── docker-compose.dev.yml       # Development environment
+├── package.json                 # Root orchestration scripts
+└── .github/workflows/           # CI/CD pipelines
+```
+
+### 🤝 Contributing
+
+1. **Backend changes**: Update C# DTOs → Run `npm run dto:generate`
+2. **Frontend changes**: Use generated DTOs for type safety
+3. **New features**: Add tests and update documentation
+4. **Commits**: Pre-commit hooks ensure quality checks
+
+**Need help?** Check the detailed docs in each feature directory or ask in team chat!

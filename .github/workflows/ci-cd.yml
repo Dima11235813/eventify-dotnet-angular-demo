@@ -1,0 +1,95 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: |
+          package-lock.json
+          app/package-lock.json
+
+    - name: Install root dependencies
+      run: npm install
+
+    - name: Install frontend dependencies
+      run: cd app && npm install
+
+    - name: Restore .NET dependencies
+      run: dotnet restore api/EventManagement.sln
+
+    - name: Build .NET solution
+      run: dotnet build api/EventManagement.sln --configuration Release --no-restore
+
+    - name: Run .NET tests
+      run: dotnet test api/EventManagement.sln --configuration Release --no-build --verbosity normal
+
+    - name: Start API for DTO generation
+      run: |
+        cd api/src/Presentation
+        dotnet run --configuration Release &
+        API_PID=$!
+        echo "API_PID=$API_PID" >> $GITHUB_ENV
+        # Wait for API to be ready
+        for i in {1..30}; do
+          if curl -f http://localhost:5146/swagger/v1/swagger.json > /dev/null 2>&1; then
+            echo "API is ready"
+            break
+          fi
+          echo "Waiting for API... ($i/30)"
+          sleep 2
+        done
+
+    - name: Generate TypeScript DTOs
+      run: |
+        cd tools/dto-sync
+        npm install
+        node generate-dtos.js
+
+    - name: Verify DTOs were generated
+      run: |
+        if [ ! -d "app/src/app/shared/dto" ]; then
+          echo "DTOs directory not found!"
+          exit 1
+        fi
+        if [ ! -f "app/src/app/shared/dto/index.ts" ]; then
+          echo "DTO index file not found!"
+          exit 1
+        fi
+        echo "DTOs generated successfully"
+
+    - name: Build Angular app
+      run: cd app && npm run build --prod
+
+    - name: Run Angular tests
+      run: cd app && npm test -- --watch=false --browsers=ChromeHeadless
+
+    - name: Stop API
+      run: |
+        if [ ! -z "$API_PID" ]; then
+          kill $API_PID || true
+        fi
+
+    - name: Build Docker images
+      run: |
+        docker build -t eventify-api ./api
+        docker build -t eventify-dto-sync ./tools/dto-sync
