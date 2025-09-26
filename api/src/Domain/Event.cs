@@ -2,8 +2,9 @@ namespace EventManagement.Domain;
 
 public interface IEvent
 {
+    Guid Id { get; }
     string Title { get; }
-    string Description { get; }
+    string? Description { get; }
     DateTimeOffset Date { get; }
     int MaxCapacity { get; }
 }

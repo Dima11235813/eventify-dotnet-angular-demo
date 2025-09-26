@@ -7,6 +7,23 @@ public class InMemoryEventStore : IEventStore
     private readonly Dictionary<Guid, Event> _events = new();
     private readonly ReaderWriterLockSlim _lock = new();
 
+    public InMemoryEventStore()
+    {
+        // Seed with mock data from EventCatalog
+        _lock.EnterWriteLock();
+        try
+        {
+            foreach (var @event in EventRepository.Events)
+            {
+                _events[@event.Id] = (Event)@event;
+            }
+        }
+        finally
+        {
+            _lock.ExitWriteLock();
+        }
+    }
+
     public Task<Event?> GetByIdAsync(Guid id)
     {
         _lock.EnterReadLock();
