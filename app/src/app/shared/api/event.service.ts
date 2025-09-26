@@ -2,6 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { BaseApiService } from './base-api.service';
 import { APP_CONFIG, AppConfig } from '../config/app-config.model';
 import { Observable } from 'rxjs';
+import { CreateEventDto } from '../dto/model/createEventDto';
+import { UpdateEventDto } from '../dto/model/updateEventDto';
 
 export type EventDto = {
   id: string;
@@ -28,6 +30,19 @@ export class EventService extends BaseApiService {
     const base = `${this.endpoint('events')}/${id}`;
     const url = userId ? `${base}?userId=${encodeURIComponent(userId)}` : base;
     return this.get<EventDto>(url);
+  }
+
+  create(dto: CreateEventDto) {
+    return this.post<EventDto>(this.endpoint('events'), dto);
+  }
+
+  update(id: string, dto: UpdateEventDto) {
+    return this.put<EventDto>(this.endpoint('eventById', { id }), dto);
+  }
+
+  deleteEvent(id: string) {
+    // Backend DELETE may not be available yet; call and let caller handle 405/404
+    return this.delete<void>(this.endpoint('eventById', { id }));
   }
 
   register(eventId: string, userId: string) {
