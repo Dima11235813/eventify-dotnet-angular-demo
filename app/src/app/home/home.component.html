@@ -20,7 +20,8 @@
 
 <section class="container upcoming">
   <h2>Upcoming Events</h2>
-  <app-events-preview></app-events-preview>
+  <!-- Pure presentational child; receives data as input (kept simple via attribute binding) -->
+  <app-events-preview [events]="events() || []"></app-events-preview>
 </section>
 
 

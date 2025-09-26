@@ -1,15 +1,15 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { EventService, EventDto } from '../shared/api/event.service';
+import { EventDto } from '../shared/api/event.service';
 
 @Component({
   selector: 'app-events-preview',
   standalone: true,
   imports: [CommonModule, DatePipe, RouterLink],
   template: `
-    <div class="grid" *ngIf="events() as list; else loadingTmpl">
-      <article class="card event" *ngFor="let e of list | slice:0:3">
+    <div class="grid" *ngIf="events?.length; else emptyOrLoading">
+      <article class="card event" *ngFor="let e of events | slice:0:3">
         <div class="event__body">
           <h3>{{ e.title }}</h3>
           <p class="desc">{{ e.description }}</p>
@@ -23,8 +23,8 @@ import { EventService, EventDto } from '../shared/api/event.service';
         </div>
       </article>
     </div>
-    <ng-template #loadingTmpl>
-      <div class="loading">Loading events…</div>
+    <ng-template #emptyOrLoading>
+      <div class="loading">No events to display.</div>
     </ng-template>
     <div class="actions">
       <a class="btn-primary" routerLink="/events">Load More Events</a>
@@ -41,16 +41,8 @@ import { EventService, EventDto } from '../shared/api/event.service';
     `.loading{color:var(--muted);padding:12px 0}`
   ]
 })
-export class EventsPreviewComponent implements OnInit {
-  private readonly eventsApi = inject(EventService);
-  readonly events = signal<EventDto[] | null>(null);
-
-  ngOnInit(): void {
-    this.eventsApi.list().subscribe({
-      next: (list) => this.events.set(list),
-      error: () => this.events.set([])
-    });
-  }
+export class EventsPreviewComponent {
+  @Input({ required: false }) events: EventDto[] = [];
 }
 
 
