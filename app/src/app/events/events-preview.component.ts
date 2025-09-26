@@ -31,7 +31,7 @@ import { EventDto } from '../shared/api/event.service';
     </div>
   `,
   styles: [
-    `.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}`,
+    `.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;justify-content:center;max-width:700px;margin:0 auto;}`,
     `.event{padding:14px}`,
     `.desc{color:var(--muted);height:40px;overflow:hidden}`,
     `.meta{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}`,
