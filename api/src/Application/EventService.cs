@@ -24,7 +24,9 @@ public class EventService : IEventService
     public async Task<IEnumerable<EventDto>> GetAllEventsAsync(string? userId = null)
     {
         var events = await _eventStore.GetAllAsync();
-        return events.Select(e => MapToDto(e, userId));
+        return events
+            .OrderByDescending(e => e.Date)
+            .Select(e => MapToDto(e, userId));
     }
 
     public async Task<EventDto> CreateEventAsync(CreateEventDto createEventDto)
