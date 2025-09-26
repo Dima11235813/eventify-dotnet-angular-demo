@@ -11,7 +11,10 @@ import { PageLoaderService } from '../shared/ui/page-loader.service';
   standalone: true,
   imports: [CommonModule, EventFormComponent],
   template: `
-    <h2 class="page-title">Edit Event</h2>
+    <div class="admin-card" style="margin-bottom:12px;">
+      <h2 class="page-title">Edit Event</h2>
+      <p class="page-subtitle">Update your event details</p>
+    </div>
     <ng-container *ngIf="event(); else loading">
       <div *ngIf="isPast(); else formTpl" class="admin-card" style="color:#6b7280;">
         Event in the past — editing disabled.

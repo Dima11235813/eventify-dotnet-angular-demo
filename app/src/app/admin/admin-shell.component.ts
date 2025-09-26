@@ -21,7 +21,7 @@ import { PageLoaderService } from '../shared/ui/page-loader.service';
         </div>
       </aside>
       <main class="admin-main">
-        <div *ngIf="loader.isLoading()" class="page-skeleton" aria-busy="true" aria-live="polite">
+        <div class="page-skeleton overlay" [class.hidden]="!loader.isLoading()" aria-busy="true" aria-live="polite">
           <div class="skeleton-card">
             <div class="skeleton-line lg" style="width:180px"></div>
             <div style="height:12px"></div>
@@ -34,9 +34,7 @@ import { PageLoaderService } from '../shared/ui/page-loader.service';
           <div class="skeleton-card"><div class="skeleton-line md"></div><div style="height:8px"></div><div class="skeleton-line sm"></div></div>
           <div class="skeleton-card"><div class="skeleton-line md"></div><div style="height:8px"></div><div class="skeleton-line sm"></div></div>
         </div>
-        <ng-container *ngIf="!loader.isLoading()">
-          <router-outlet />
-        </ng-container>
+        <router-outlet />
       </main>
     </div>
   `
@@ -64,6 +62,8 @@ import { PageLoaderService } from '../shared/ui/page-loader.service';
     `@keyframes spin{to{transform:rotate(360deg)}}`,
     `@media (max-width:900px){.admin-shell{grid-template-columns:1fr}.admin-sidebar{position:static;min-height:auto}.admin-main{padding:0 16px}}`,
     `.page-skeleton{display:grid;gap:16px}`,
+    `.page-skeleton.overlay{position:fixed;inset:56px 0 0 0;pointer-events:none;background:linear-gradient(to bottom, rgba(243,244,246,.8), rgba(243,244,246,.4));backdrop-filter:saturate(120%) blur(1px);padding:24px 48px;}`,
+    `.page-skeleton.overlay.hidden{display:none}`,
     `.skeleton-card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;}`,
     `.skeleton-line{height:14px;background:linear-gradient(90deg,#f3f4f6,#e5e7eb,#f3f4f6);background-size:200% 100%;animation:shine 1.2s infinite;border-radius:6px;}`,
     `.skeleton-line.sm{height:10px;width:40%}`,
