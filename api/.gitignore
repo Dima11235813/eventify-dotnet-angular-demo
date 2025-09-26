@@ -73,3 +73,8 @@ TestResults/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+## Coverage Report for anything under api\EventManagement.Tests\api
+coveragereport/*
+TestResults/*
+## api\EventManagement.Tests\api\coveragereport\EventManagement.Application_UpdateEventDto.html

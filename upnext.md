@@ -1,0 +1,1 @@
+each event should be clickable and route to a page for event detail use designs for each event

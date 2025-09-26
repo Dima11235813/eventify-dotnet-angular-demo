@@ -15,6 +15,40 @@ public class EventsController : ControllerBase
         _eventService = eventService;
     }
 
+    /// <summary>
+    /// Returns sample metadata for any event id (mock endpoint for OpenAPI/Swagger visibility).
+    /// </summary>
+    /// <param name="id">Event id (ignored)</param>
+    /// <returns>Sample EventMetaDataDto</returns>
+    [HttpGet("{id}/metadata")]
+    public ActionResult<EventMetaDataDto> GetEventMetadata(Guid id)
+    {
+        var sample = new EventMetaDataDto
+        {
+            EventId = id,
+            Title = "Sample Event",
+            Description = "This is a sample event used for API documentation and UI testing.",
+            Organizer = "Eventify Team",
+            Location = "Online",
+            StartDate = DateTimeOffset.UtcNow.AddDays(7),
+            EndDate = DateTimeOffset.UtcNow.AddDays(7).AddHours(2),
+            AttendeeCount = 42,
+            Capacity = 100,
+            IsOnline = true,
+            EventUrl = "https://example.com/events/sample",
+            Tags = new List<string> { "tech", "webinar" },
+            Category = "Technology",
+            ImageUrl = "https://picsum.photos/seed/eventify/600/400",
+            Price = 0,
+            Currency = "USD",
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-3),
+            UpdatedAt = DateTimeOffset.UtcNow,
+            Status = "Upcoming"
+        };
+
+        return Ok(sample);
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetAllEvents([FromQuery] string? userId)
     {

@@ -102,9 +102,9 @@ curl -i -X POST http://localhost:5146/events/EVENT_ID/register \
 
 ```bash
 # Replace EVENT_ID with an event whose date is in the past
-curl -i -X POST http://localhost:5146/events/EVENT_ID/register \
+curl -i -X POST http://localhost:5146/events/3d7e521f-8ed9-439b-8a1c-6276f668b2b0/register \
   -H "Content-Type: application/json" \
-  -d '{"userId":"demo-user-123"}'
+  -d '{"userId":"demo-user-456"}'
 ```
 
 4) Successful registration when there is capacity and the event is in the future (expect HTTP 200)
@@ -242,11 +242,48 @@ dotnet watch test
 
 #### Test Coverage
 
-The test suite covers:
+You can generate a coverage report using the built-in collector and ReportGenerator:
+
+```bash
+# From the api directory
+dotnet tool restore
+dotnet test --collect:"XPlat Code Coverage" --settings coverlet.runsettings --results-directory ./TestResults
+
+# Generate HTML report
+dotnet tool run reportgenerator \
+  -reports:TestResults/**/coverage.cobertura.xml \
+  -targetdir:coveragereport \
+  -reporttypes:Html
+
+# Open coveragereport/index.html in your browser
+```
+
+Alternatively, from the repo root you can run the prepared scripts:
+
+```bash
+npm run coverage:api
+# Windows
+npm run coverage:open
+# Or open manually: api/coveragereport/index.html
+```
+
+The test suite currently covers:
 
 - **EventService**: All CRUD operations, registration logic, error handling
 - **InMemoryEventStore**: Data persistence, thread safety, seeding with mock data
 - **Error scenarios**: Invalid operations, not found cases, validation failures
+
+#### Interpreting the coverage report
+
+- **Overall metrics**: Top of the report shows totals for line, branch, and method coverage. Higher is better; aim for incremental improvements over time.
+- **Colors**:
+  - Green: covered lines/branches
+  - Red: uncovered lines/branches
+  - Yellow: partially covered branches
+- **Per-assembly and per-class tables**: Drill down to `src/` projects (ignore `EventManagement.Tests`). Sort by uncovered lines to find the biggest gaps.
+- **Hotspots**: Focus first on uncovered code in `Application` and `Domain` layers where business logic lives.
+- **Filters**: The runsettings already excludes the test assembly and auto-generated code attributes.
+- **Note**: Coverage reflects only code executed by tests. Failing tests still produce coverage, but stabilize tests for trustworthy trends.
 
 ### Test Structure
 

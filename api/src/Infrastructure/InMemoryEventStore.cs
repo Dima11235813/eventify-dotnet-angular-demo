@@ -4,6 +4,8 @@ namespace EventManagement.Infrastructure;
 
 public class InMemoryEventStore : IEventStore
 {
+    // Each public method acquires a lock and releases it in a finally block—nice and safe.
+    //Clear read vs. write separation: Lookups use EnterReadLock, mutations use EnterWriteLock.
     private readonly Dictionary<Guid, Event> _events = new();
     private readonly ReaderWriterLockSlim _lock = new();
 
@@ -11,11 +13,14 @@ public class InMemoryEventStore : IEventStore
     {
         // Seed with mock data from EventCatalog
         _lock.EnterWriteLock();
+        // Seeding under a write lock: Keeps construction atomic and consistent.
         try
         {
             foreach (var @event in EventRepository.Events)
             {
-                _events[@event.Id] = (Event)@event;
+                // Create a copy of the event to avoid modifying the static readonly instances
+                var eventCopy = new Event(@event.Id, @event.Title, @event.Description, @event.Date, @event.MaxCapacity);
+                _events[@event.Id] = eventCopy;
             }
 
             // Seed registrations: among FUTURE-dated events, make half fully booked and half with one spot left
@@ -58,7 +63,11 @@ public class InMemoryEventStore : IEventStore
             _lock.ExitWriteLock();
         }
     }
-
+    /**
+    * @param id The ID of the event to get.
+    * @returns The event with the given ID, or null if no event with that ID exists.
+    * @throws InvalidOperationException if the event is not found.
+    */
     public Task<Event?> GetByIdAsync(Guid id)
     {
         _lock.EnterReadLock();

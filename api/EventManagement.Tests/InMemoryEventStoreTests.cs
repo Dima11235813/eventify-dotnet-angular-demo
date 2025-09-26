@@ -214,6 +214,7 @@ public class InMemoryEventStoreTests
         // Act - Perform multiple concurrent operations
         for (int i = 0; i < 10; i++)
         {
+            // Capturing the loop variable safely. You copy i into taskId, avoiding the classic closure bug.
             var taskId = i;
             tasks.Add(Task.Run(async () =>
             {
@@ -224,12 +225,13 @@ public class InMemoryEventStoreTests
                     DateTimeOffset.Now.AddDays(30 + taskId),
                     100 + taskId
                 );
-
+                
+                //Black-box usage. You exercise _eventStore like a consumer would (no peeking into internals).
                 await _eventStore.AddAsync(newEvent);
                 results.Add(newEvent);
             }));
         }
-
+        //WhenAll over a set of tasks. Ensures all work finishes (or aggregates exceptions).
         await Task.WhenAll(tasks);
 
         // Assert

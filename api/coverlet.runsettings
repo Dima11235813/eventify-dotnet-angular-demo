@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <!-- Generate Cobertura format for compatibility with ReportGenerator -->
+          <Format>cobertura</Format>
+
+          <!-- Include only solution assemblies; exclude the test project assembly -->
+          <Include>[EventManagement.*]*</Include>
+          <Exclude>[EventManagement.Tests]*</Exclude>
+
+          <!-- Common exclusions -->
+          <ExcludeByAttribute>CompilerGeneratedAttribute,GeneratedCodeAttribute,ExcludeFromCodeCoverageAttribute</ExcludeByAttribute>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>
+
+
