@@ -4,13 +4,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { EventFormComponent } from './event-form.component';
 import { EventService, EventDto } from '../shared/api/event.service';
 import { ToastService } from '../shared/logging';
+import { PageLoaderService } from '../shared/ui/page-loader.service';
 
 @Component({
   selector: 'app-edit-event',
   standalone: true,
   imports: [CommonModule, EventFormComponent],
   template: `
-    <h2 style="margin:0 0 12px;">Edit Event</h2>
+    <h2 class="page-title">Edit Event</h2>
     <ng-container *ngIf="event(); else loading">
       <div *ngIf="isPast(); else formTpl" class="admin-card" style="color:#6b7280;">
         Event in the past — editing disabled.
@@ -29,14 +30,17 @@ export class EditEventComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly toast = inject(ToastService);
+  private readonly pageLoader = inject(PageLoaderService);
 
   readonly event = signal<EventDto | null>(null);
 
   constructor() {
     const id = this.route.snapshot.paramMap.get('id')!;
+    this.pageLoader.start();
     this.api.getById(id).subscribe({
       next: (e) => this.event.set(e),
-      error: () => { this.toast.error('Event not found'); this.router.navigate(['/admin/events']); }
+      error: () => { this.toast.error('Event not found'); this.router.navigate(['/admin/events']); },
+      complete: () => this.pageLoader.stop()
     });
   }
 
@@ -50,9 +54,11 @@ export class EditEventComponent {
       this.toast.error('Max capacity cannot be below current registrations');
       return;
     }
+    this.pageLoader.start();
     this.api.update(id, payload).subscribe({
       next: () => { this.toast.success('Event updated'); this.router.navigate(['/admin/events']); },
-      error: (err) => this.toast.error(err?.error || 'Failed to update event')
+      error: (err) => this.toast.error(err?.error || 'Failed to update event'),
+      complete: () => this.pageLoader.stop()
     });
   }
 }

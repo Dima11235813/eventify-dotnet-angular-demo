@@ -18,6 +18,8 @@
     "test": "npm run test:api && npm run test:frontend",
     "test:api": "cd api && dotnet test",
     "test:frontend": "cd app && npm test",
+    "e2e": "cd app && npm run e2e",
+    "e2e:update": "cd app && npx playwright test --update-snapshots",
     "docker:build": "docker-compose -f docker-compose.dev.yml build",
     "docker:up": "docker-compose -f docker-compose.dev.yml up -d",
     "docker:down": "docker-compose -f docker-compose.dev.yml down",
@@ -31,6 +33,7 @@
     "tools/dto-sync"
   ],
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "@playwright/test": "^1.47.2"
   }
 }

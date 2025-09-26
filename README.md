@@ -46,6 +46,20 @@ Welcome to Eventify! This guide will help you get started with development on ou
    - Frontend: http://localhost:4200
    - DTOs: `app/src/app/shared/dto/`
 
+### End-to-End tests (Playwright)
+
+From the repo root:
+
+```bash
+# Ensure API is running (if not using npm start)
+dotnet run --project api/src/Presentation/EventManagement.Presentation.csproj
+
+# Run e2e against Angular dev server
+npm run e2e
+```
+
+E2E specs live under `app/tests/e2e/` with config at `app/playwright.config.ts`.
+
 ### 🏗️ Architecture Overview
 
 Eventify uses a **monorepo** structure with automated DTO synchronization:
